@@ -1,0 +1,80 @@
+import React from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { usePetStore } from '../utils/store';
+import { MapPin, Mail } from 'lucide-react';
+
+export default function ListingDetails() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get('id');
+  const pet = usePetStore((state) => state.getPet(id || ''));
+
+  if (!pet) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-semibold">Pet not found</h2>
+        <button
+          onClick={() => navigate('/listings')}
+          className="btn btn-primary mt-4"
+        >
+          Browse Pets:
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div className="bg-white rounded-xl overflow-hidden">
+        <div className="aspect-video w-full">
+          <img
+            src={pet.imageUrl}
+            alt={pet.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        <div className="p-6 space-y-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">{pet.name}</h1>
+              <div className="flex items-center space-x-2 text-gray-500">
+                <span className="capitalize">{pet.type}</span>
+                <span>•</span>
+                <span>{pet.breed}</span>
+                <span>•</span>
+                <span>{pet.age} years old</span>
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-primary-600">
+              ${pet.price}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 text-gray-600">
+            <MapPin />
+            <span>{pet.location}</span>
+          </div>
+
+          <div className="prose max-w-none">
+            <h2>About {pet.name}</h2>
+            <p>{pet.description}</p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h2 className="text-lg font-semibold mb-4">Contact Seller</h2>
+            <div className="space-y-2">
+              <p className="font-medium">{pet.seller.name}</p>
+              <div className="flex items-center space-x-2 text-primary-600">
+                <Mail size={20} />
+                <a href={`mailto:${pet.seller.contact}`} className="hover:underline">
+                  {pet.seller.contact}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
